@@ -5,6 +5,9 @@ import (
 	"github.com/WanderaOrg/s3syncer/pkg/sync"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 var loglevel, folderToWatch, s3Path, s3Region string
@@ -22,7 +25,23 @@ var rootCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return sync.RunSync(folderToWatch, s3Region, s3Path)
+		stop := make(chan struct{})
+		syncer, err := sync.NewSyncer(folderToWatch, s3Region, s3Path, stop)
+		if err != nil {
+			return err
+		}
+		if err := syncer.Sync(); err != nil {
+			return err
+		}
+
+		signalChan := make(chan os.Signal, 1)
+		signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+
+		log.Info("started syncer")
+		<-signalChan
+		log.Info("shutdown signal received, exiting...")
+		close(stop)
+		return nil
 	},
 }
 
