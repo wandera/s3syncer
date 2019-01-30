@@ -37,10 +37,10 @@ func RunSync(folderToWatch, s3Region, s3Path string) error {
 				// watch for errors
 				switch {
 				case event.Op&fsnotify.Write == fsnotify.Write:
-					log.Infof("modified file:", event.Name, "\nUploading to S3")
+					log.Info("modified file:", event.Name, "\nUploading to S3")
 					uploadFile(event.Name, s3Region, s3Bucket, s3Folder)
 				case event.Op&fsnotify.Create == fsnotify.Create:
-					log.Infof("New file:", event.Name, "\nUploading to S3")
+					log.Info("New file:", event.Name, "\nUploading to S3")
 					uploadFile(event.Name, s3Region, s3Bucket, s3Folder)
 				default:
 					log.Println("No changes")
