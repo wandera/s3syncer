@@ -120,3 +120,6 @@ local.properties
 .scala_dependencies
 .worksheet
 
+# Binary
+s3syncer
+
