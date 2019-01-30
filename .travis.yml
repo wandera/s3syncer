@@ -20,3 +20,41 @@ env:
 script:
   - go test -v ./...
   - go vet -v ./...
+
+before_deploy:
+  - PLATFORMS=(darwin/amd64 freebsd/amd64 linux/amd64 windows/amd64)
+
+  # build binary for all archs
+  - |
+    for PLATFORM in "${PLATFORMS[@]}"; do
+      echo "Building $PLATFORM"
+      GOOS=${PLATFORM%/*}
+      GOARCH=${PLATFORM#*/}
+      if [ "$GOOS" = "windows" ]; then
+        build_cmd="GOOS=$GOOS GOARCH=$GOARCH go build -o s3syncer -ldflags '-w -s'"
+      else
+        build_cmd="CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH go build -o s3syncer -ldflags '-w -s'"
+      fi
+      if ! eval $build_cmd; then
+        echo "Failed building sample for $PLATFORM" && return 1
+      fi
+      if [ "$GOOS" = "windows" ]; then
+        zip s3syncer-${GOOS}-${GOARCH}.zip s3syncer
+      else
+        tar cvzf s3syncer-${GOOS}-${GOARCH}.tgz s3syncer
+      fi
+    done
+  - ls
+
+deploy:
+  provider: releases
+  api_key:
+    secure: gtT3CT0Rh4nEyczo3bpWEsTsoXh272UmLY8eTI/3uGUItPpdQwP3fTsz2dhGB397FalzNuWlCwexo4l7Ky/euftA9/eOdbHW2SDe2dBLp6GqshXhFgXIhtJ8iU6JPFIsToTxGQb8/VVqse8Bl1Z/deuMwlkZyPMd+Mjv/Kf1wRwmGtbjexwZwzawVTyad1B0XYNuCaZo0SnNpjt4iCI5ikTMkJ0V+nd7qxeBK+fvOJTyel43W4eoltZZfkqXe4abiCfE8lFrrBjePUNPy+RzzFAY7RsM1JsBLID/Xn/6gJz1ppC1u4SyU6K5Wy1CK/O1hsmuXfc2QRRqZ+q6/XItil0Qq3OKikEnzSMhldTzEkvv7zK6rO0OvnzQX8/LjUt1nOr+F3NILoJUwSVuPNfZ4RGGVRSlyGM2cCTrVK6Lcqc28jyrJeyZznbVEr+Gcezbnlh70Jvh8f8ov9xWmSGsTBq2kxt/EIsqi8rp2yxzSLBx+FHC771xm4pQc6OP0FiMiTJvcI29EazM3vN345sH14r1zYcK4jWAhXKjdFh1OGIF4b5ZyhiePAh2u09MEJzsAH7wyjxiZzGweGDZdhf4HGrR4F5TG0rkJEIaWJKYx5ALBpGfSUkEwqQBvxFWk9z43oUkyH4neRa+SjZQkk63HrHfmlvsG9QecEGxvPXhHRg=
+  file:
+    - "s3syncer-darwin-amd64.tgz"
+    - "s3syncer-freebsd-amd64.tgz"
+    - "s3syncer-linux-amd64.tgz"
+    - "s3syncer-windows-amd64.zip"
+  skip_cleanup: true
+  on:
+    tags: true
