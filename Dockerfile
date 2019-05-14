@@ -12,6 +12,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build
 
 # Runtime image
 FROM alpine:3.8
+RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
 COPY --from=builder /build/s3syncer /app/s3syncer
 WORKDIR /app
 
