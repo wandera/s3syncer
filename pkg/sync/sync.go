@@ -109,6 +109,11 @@ func (s *syncer) addFileToS3(sess *session.Session, fileDir string) error {
 		return err
 	}
 
+	_, err = file.Seek(0, 0)
+	if err != nil {
+		return err
+	}
+
 	_, err = s.uploader.Upload(&s3manager.UploadInput{
 		Bucket:             aws.String(s.s3Bucket),
 		Key:                aws.String(s.s3Folder + filepath.Base(fileDir)),
