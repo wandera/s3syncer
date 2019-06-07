@@ -2,12 +2,14 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/WanderaOrg/s3syncer/pkg/sync"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/WanderaOrg/s3syncer/pkg/sync"
+	"github.com/rjeczalik/notify"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
 var loglevel, folderToWatch, s3Path, s3Region string
@@ -25,7 +27,13 @@ var rootCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		stop := make(chan struct{})
+		stop := make(chan notify.EventInfo)
+
+		if err := notify.Watch(folderToWatch+"/...", stop, notify.Create, notify.Write); err != nil {
+			return err
+		}
+		defer notify.Stop(stop)
+
 		syncer, err := sync.NewSyncer(folderToWatch, s3Region, s3Path, stop)
 		if err != nil {
 			return err
@@ -40,7 +48,6 @@ var rootCmd = &cobra.Command{
 		log.Info("started syncer")
 		<-signalChan
 		log.Info("shutdown signal received, exiting...")
-		close(stop)
 		return nil
 	},
 }
