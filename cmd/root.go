@@ -6,10 +6,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/WanderaOrg/s3syncer/pkg/sync"
 	"github.com/rjeczalik/notify"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/wandera/s3syncer/pkg/sync"
 )
 
 var loglevel, folderToWatch, s3Path, s3Region string

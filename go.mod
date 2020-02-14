@@ -1,4 +1,4 @@
-module github.com/WanderaOrg/s3syncer
+module github.com/wandera/s3syncer
 
 require (
 	github.com/aws/aws-sdk-go v1.16.26
