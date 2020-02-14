@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/WanderaOrg/s3syncer/cmd"
 	log "github.com/sirupsen/logrus"
+	"github.com/wandera/s3syncer/cmd"
 )
 
 // main
