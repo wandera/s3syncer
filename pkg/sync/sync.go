@@ -81,6 +81,16 @@ func (s *syncer) uploadFile(fileDir string) {
 	err := s.addFileToS3(s.s3session, fileDir)
 	if err != nil {
 		log.Error(err)
+		return
+	}
+	s.removeFile(fileDir)
+}
+
+// remove upladed file - during crash loops it might fill up filesystem
+func (s *syncer) removeFile(fileDir string) {
+	err := os.Remove(fileDir)
+	if err != nil {
+		log.Error(err)
 	}
 }
 
