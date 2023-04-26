@@ -5,7 +5,6 @@ import (
 	"github.com/wandera/s3syncer/cmd"
 )
 
-// main
 func main() {
 	if err := cmd.Execute(); err != nil {
 		log.Fatal(err)
