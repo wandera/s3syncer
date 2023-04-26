@@ -4,6 +4,10 @@ BIN = s3syncer
 build: *.go **/*.go
 	go build -o $(BIN)
 
+.PHONY: check
+check:
+	golangci-lint run
+
 .PHONY: clean
 clean:
 	$(RM) $(BIN)
