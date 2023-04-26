@@ -54,22 +54,20 @@ func IsDirectory(path string) bool {
 func (s *syncer) Sync() error {
 	go func() {
 		for {
-			select {
-			case event := <-s.stop:
-				log.Debug(event.Path())
-				switch {
-				// watch for errors
-				case IsDirectory(event.Path()):
-					log.Debugf("new directory '%s'", event.Path())
-				case event.Event() == notify.Write:
-					log.Infof("uploading modified file '%s' to S3", event.Path())
-					go s.uploadFile(event.Path())
-				case event.Event() == notify.Create:
-					log.Infof("uploading new file '%s' to S3", event.Path())
-					go s.uploadFile(event.Path())
-				default:
-					log.Debug("no changes")
-				}
+			event := <-s.stop
+			log.Debug(event.Path())
+			switch {
+			// watch for errors
+			case IsDirectory(event.Path()):
+				log.Debugf("new directory '%s'", event.Path())
+			case event.Event() == notify.Write:
+				log.Infof("uploading modified file '%s' to S3", event.Path())
+				go s.uploadFile(event.Path())
+			case event.Event() == notify.Create:
+				log.Infof("uploading new file '%s' to S3", event.Path())
+				go s.uploadFile(event.Path())
+			default:
+				log.Debug("no changes")
 			}
 		}
 	}()
@@ -86,7 +84,7 @@ func (s *syncer) uploadFile(fileDir string) {
 	s.removeFile(fileDir)
 }
 
-// remove upladed file - during crash loops it might fill up filesystem
+// remove upladed file - during crash loops it might fill up filesystem.
 func (s *syncer) removeFile(fileDir string) {
 	err := os.Remove(fileDir)
 	if err != nil {
@@ -96,8 +94,7 @@ func (s *syncer) removeFile(fileDir string) {
 
 // addFileToS3 will upload a single file to S3, it will require a pre-built aws session
 // and will set file info like content type and encryption on the uploaded file.
-func (s *syncer) addFileToS3(sess *session.Session, fileDir string) error {
-
+func (s *syncer) addFileToS3(_ *session.Session, fileDir string) error {
 	// Open the file for use
 	file, err := os.Open(fileDir)
 	if err != nil {
