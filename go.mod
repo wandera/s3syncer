@@ -2,6 +2,8 @@ module github.com/wandera/s3syncer
 
 go 1.21
 
+toolchain go1.21.5
+
 require (
 	github.com/aws/aws-sdk-go v1.49.0
 	github.com/rjeczalik/notify v0.9.3
