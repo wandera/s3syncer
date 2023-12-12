@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-sdk-go v1.49.0
 	github.com/rjeczalik/notify v0.9.3
 	github.com/sirupsen/logrus v1.9.3
-	github.com/spf13/cobra v1.7.0
+	github.com/spf13/cobra v1.8.0
 )
 
 require (
