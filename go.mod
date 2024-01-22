@@ -5,7 +5,7 @@ go 1.21
 toolchain go1.21.5
 
 require (
-	github.com/aws/aws-sdk-go v1.49.0
+	github.com/aws/aws-sdk-go v1.50.1
 	github.com/rjeczalik/notify v0.9.3
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.8.0
